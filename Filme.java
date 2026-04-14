@@ -1,5 +1,3 @@
-package src;
-
 public class Filme {
     private final int id;
     private final String titulo;

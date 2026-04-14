@@ -1,5 +1,3 @@
-package src;
-
 public enum TipoMensagem {
     LISTAR_FILMES,
     DETALHAR_FILME,
