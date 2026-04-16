@@ -14,7 +14,7 @@ Projeto de servidor cliente-servidor utilizando sockets em Java, com suporte a m
 Exemplo:
 ```json
 {"tipo":"DETALHAR_FILME","id":1}
-´´´
+
 
 ### 🧩 2. Padronização de Respostas
 
@@ -25,7 +25,7 @@ Exemplo:
   "status": "OK",
   "mensagem": "Sucesso",
   "dados": {...}
-}´´´
+}
 
 ### 🏗️ 3. Refatoração do CatalogoService
 - Remoção de retorno em String
