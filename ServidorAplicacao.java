@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +16,39 @@ public class ServidorAplicacao {
 
     private static final Set<String> ipsAtivos = ConcurrentHashMap.newKeySet();
 
+    static class ClienteInfo {
+        String ip;
+        long ultimoAcesso;
+
+        ClienteInfo(String ip) {
+            this.ip = ip;
+            this.ultimoAcesso = System.currentTimeMillis();
+        }
+
+        void atualizarAcesso() {
+            this.ultimoAcesso = System.currentTimeMillis();
+        }
+    }
+
+    private static final Map<String, ClienteInfo> clientesAtivos = new ConcurrentHashMap<>();
+
+
     public static void main(String[] args) {
+
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+        long agora = System.currentTimeMillis();
+        long TIMEOUT = 30000; // 30 segundos
+
+        clientesAtivos.entrySet().removeIf(entry -> {
+            boolean expirado = agora - entry.getValue().ultimoAcesso > TIMEOUT;
+            if (expirado) {
+                System.out.println("Removendo cliente por timeout: " + entry.getKey());
+            }
+            return expirado;
+        });
+
+    }, 10, 10, java.util.concurrent.TimeUnit.SECONDS);
+
         CatalogoService service = new CatalogoService();
         Protocolo protocolo = new Protocolo(service);
 
@@ -34,8 +67,8 @@ public class ServidorAplicacao {
                         continue;
                     }
 
-                    if (ipsAtivos.contains(ipCliente)) {
-                        recusar(socket, "Já existe uma requisição ativa deste endereço IP.");
+                    if (clientesAtivos.containsKey(ipCliente)) {
+                        recusar(socket, "Cliente já conectado.");
                         continue;
                     }
 
@@ -49,6 +82,23 @@ public class ServidorAplicacao {
         }
     }
 
+    /*  COMENTEI POIS ESTAS FUNÇÕES COMPLEMENTAM A FUNÇÃO "enviarStatusClientes", CASO ACHAR NECESSÁRIO, DESCOMENTAR.
+    private static void enviarStatusClientes(PrintWriter saida) {
+        saida.println("=== CLIENTES ATIVOS ===");
+        for (String ip : clientesAtivos.keySet()) {
+            saida.println(ip);
+        }
+        saida.println("=======================");
+    }
+
+     private static void logClientesAtivos() {
+        System.out.println("\n=== CLIENTES ATIVOS ===");
+        clientesAtivos.forEach((ip, info) -> {
+            System.out.println(ip + " | último acesso: " + info.ultimoAcesso);
+        });
+        System.out.println("=======================\n");
+    } */
+
     private static void atenderCliente(Socket socket, String ipCliente, Protocolo protocolo) {
         System.out.println("Cliente conectado: " + ipCliente);
 
@@ -57,27 +107,41 @@ public class ServidorAplicacao {
                 BufferedReader entrada = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 PrintWriter saida = new PrintWriter(s.getOutputStream(), true)
         ) {
-            String mensagem = entrada.readLine();
+            // Registrar cliente
+            clientesAtivos.put(ipCliente, new ClienteInfo(ipCliente));
 
-            if (mensagem == null) {
-                saida.println("ERRO;Nenhuma mensagem recebida.");
-                return;
+            // Isto envia para o cliente também, caso acahar necessário, descomentar
+            //enviarStatusClientes(saida);
+
+            String mensagem;
+            while ((mensagem = entrada.readLine()) != null) {
+                String resposta = protocolo.processar(mensagem);
+                saida.println(resposta);
             }
 
-            System.out.println("Recebido de " + ipCliente + ": " + mensagem);
+           /*  ANTIGO WHILE - TESTE
+                while ((mensagem = entrada.readLine()) != null) {
 
-            String resposta = protocolo.processar(mensagem);
-            saida.println(resposta);
+                System.out.println("[" + ipCliente + "] -> " + mensagem);
 
-            System.out.println("Respondido para " + ipCliente + ": " + resposta);
+                // Atualiza último acesso
+                clientesAtivos.get(ipCliente).atualizarAcesso();
+
+                String resposta = protocolo.processar(mensagem);
+                saida.println(resposta);
+            } */
 
         } catch (Exception e) {
-            System.err.println("Erro ao atender cliente " + ipCliente + ": " + e.getMessage());
+            System.err.println("Erro com cliente " + ipCliente + ": " + e.getMessage());
         } finally {
-            ipsAtivos.remove(ipCliente);
+            clientesAtivos.remove(ipCliente);
             System.out.println("Cliente desconectado: " + ipCliente);
+            /* DESCOMENTAR, CASO QUERIA QUE O CLEINTE RECEBA O LOG. 
+            logClientesAtivos(); 
+            */
         }
     }
+
 
     private static void recusar(Socket socket, String motivo) {
         try (

@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,43 +12,42 @@ public class CatalogoService {
         filmes.put(4, new Filme(4, "A Origem", "Suspense", true));
     }
 
-    public String listarFilmes() {
-        StringBuilder sb = new StringBuilder("OK;Filmes cadastrados:\n");
-        for (Filme filme : filmes.values()) {
-            sb.append(filme).append("\n");
-        }
-        return sb.toString();
+    // 🔥 AGORA retorna lista
+    public List<Filme> listarFilmes() {
+        return List.copyOf(filmes.values());
     }
 
-    public String detalharFilme(int id) {
+    // 🔥 retorna objeto
+    public Filme detalharFilme(int id) {
         Filme filme = filmes.get(id);
         if (filme == null) {
-            return "ERRO;Filme não encontrado.";
+            throw new RuntimeException("Filme não encontrado");
         }
-        return "OK;" + filme;
+        return filme;
     }
 
-    public synchronized String alugarFilme(int id) {
+    // 🔥 retorna objeto atualizado
+    public synchronized Filme alugarFilme(int id) {
         Filme filme = filmes.get(id);
         if (filme == null) {
-            return "ERRO;Filme não encontrado.";
+            throw new RuntimeException("Filme não encontrado");
         }
         if (!filme.isDisponivel()) {
-            return "ERRO;Filme já está alugado.";
+            throw new RuntimeException("Filme já está alugado");
         }
         filme.setDisponivel(false);
-        return "OK;Filme alugado com sucesso: " + filme.getTitulo();
+        return filme;
     }
 
-    public synchronized String devolverFilme(int id) {
+    public synchronized Filme devolverFilme(int id) {
         Filme filme = filmes.get(id);
         if (filme == null) {
-            return "ERRO;Filme não encontrado.";
+            throw new RuntimeException("Filme não encontrado");
         }
         if (filme.isDisponivel()) {
-            return "ERRO;Filme já está disponível no catálogo.";
+            throw new RuntimeException("Filme já está disponível");
         }
         filme.setDisponivel(true);
-        return "OK;Filme devolvido com sucesso: " + filme.getTitulo();
+        return filme;
     }
 }
