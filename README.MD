@@ -13,7 +13,7 @@ Projeto de servidor cliente-servidor utilizando sockets em Java, com suporte a m
   
 Exemplo:
 ```json
-{"tipo":"DETALHAR_FILME","id":1}
+{"tipo":"DETALHAR_FILME","id":1}**
 
 
 ### 🧩 2. Padronização de Respostas
