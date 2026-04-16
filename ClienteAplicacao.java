@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class ClienteAplicacao {
 
-    private static final String HOST = "127.0.0.1";
+    private static final String HOST = "10.10.187.0";
     private static final int PORTA = 5000;
 
     private static String cortar(String texto, int tamanho) {
