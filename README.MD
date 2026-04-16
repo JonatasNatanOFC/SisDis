@@ -12,27 +12,26 @@ Projeto de servidor cliente-servidor utilizando sockets em Java, com suporte a m
 - Agora: comunicação em **JSON estruturado**
   
 Exemplo:
-```json
+```JSON
 {"tipo":"DETALHAR_FILME","id":1}
-´´´
+```
 
 ### 🧩 2. Padronização de Respostas
-
 - Formato único de resposta:
 
-```json
+```JSON
 {
   "status": "OK",
   "mensagem": "Sucesso",
   "dados": {...}
-}´´´
+}
+```
 
 ### 🏗️ 3. Refatoração do CatalogoService
 - Remoção de retorno em String
 - Agora retorna objetos reais:
 List<Filme>
 Filme
-
 - Permite serialização automática via Jackson
 
 ### ⚙️ 4. Protocolo Mais Robusto
