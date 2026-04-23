@@ -3,6 +3,18 @@
 ## 🧠 Visão Geral
 Projeto de servidor cliente-servidor utilizando sockets em Java, com suporte a múltiplos clientes e comunicação baseada em JSON.
 
+## Comandos para executar os códigos 
+
+Exemplos:
+```BASH Servidor
+mvn exec:java -D exec.mainClass="ServidorAplicacao"
+```
+
+```BASH Cliente
+mvn exec:java -D exec.mainClass="ClienteAplicacao"
+```
+
+
 ---
 
 ## 🚀 Principais Evoluções
