@@ -58,12 +58,12 @@ Filme
 - Múltiplas requisições sem reconectar
 - Melhor desempenho e realismo
 
-###🎯 6. Interface do Cliente (UX)
+### 🎯 6. Interface do Cliente (UX)
 - Menu baseado em números
 - Usuário não precisa conhecer JSON
 - JSON gerado internamente
 
-###📊 7. Exibição de Dados
+### 📊 7. Exibição de Dados
 - Respostas formatadas no cliente
 - Lista de filmes exibida em tabela
 - Melhor legibilidade no terminal
