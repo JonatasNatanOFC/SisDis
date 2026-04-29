@@ -84,7 +84,6 @@ public class ServidorAplicacao {
                 Socket s = socket;
                 PrintWriter saida = new PrintWriter(s.getOutputStream(), true)
         ) {
-            // 🔥 Agora em JSON (padronizado com o resto do sistema)
             saida.println("{\"status\":\"ERRO\",\"mensagem\":\"" + motivo + "\"}");
         } catch (Exception e) {
             System.err.println("Erro ao recusar conexão: " + e.getMessage());

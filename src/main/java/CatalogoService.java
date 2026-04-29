@@ -12,12 +12,12 @@ public class CatalogoService {
         filmes.put(4, new Filme(4, "A Origem", "Suspense", true));
     }
 
-    // 🔥 AGORA retorna lista
+    // retorna lista
     public List<Filme> listarFilmes() {
         return List.copyOf(filmes.values());
     }
 
-    // 🔥 retorna objeto
+    // retorna objeto
     public Filme detalharFilme(int id) {
         Filme filme = filmes.get(id);
         if (filme == null) {
@@ -26,7 +26,7 @@ public class CatalogoService {
         return filme;
     }
 
-    // 🔥 retorna objeto atualizado
+    // retorna objeto atualizado
     public synchronized Filme alugarFilme(int id) {
         Filme filme = filmes.get(id);
         if (filme == null) {

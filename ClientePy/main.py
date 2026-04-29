@@ -1,8 +1,9 @@
 import socket
 import json
 
+
 class ClienteFilmes:
-    def __init__(self, host='localhost', port=5000):
+    def __init__(self, host='172.17.0.1', port=5000):
         self.host = host
         self.port = port
         self.socket = None
@@ -17,16 +18,15 @@ class ClienteFilmes:
             exit()
 
     def enviar_requisicao(self, tipo, **kwargs):
-        
+
         payload = {"tipo": tipo}
         payload.update(kwargs)
-        
+
         try:
-            
+
             mensagem = json.dumps(payload) + "\n"
             self.socket.sendall(mensagem.encode('utf-8'))
-            
-            
+
             resposta_bruta = self.socket.recv(4096).decode('utf-8')
             if not resposta_bruta:
                 return None
@@ -41,6 +41,8 @@ class ClienteFilmes:
         print("="*30)
         print("1. Listar todos os filmes")
         print("2. Detalhar filme por ID")
+        print("3. Alugar filme por ID")
+        print("4. Devolver filme por ID")
         print("0. Sair")
         return input("Escolha uma opção: ")
 
@@ -58,14 +60,37 @@ class ClienteFilmes:
     def detalhar_filme(self):
         id_filme = input("Digite o ID do filme: ")
         res = self.enviar_requisicao("DETALHAR_FILME", id=int(id_filme))
-        
+
         if res and res.get("status") == "OK":
             dados = res.get("dados")
             print("\n📌 DETALHES DO FILME:")
             for chave, valor in dados.items():
                 print(f"  {chave.capitalize()}: {valor}")
         else:
-            print(f"❌ Erro: {res.get('mensagem') if res else 'Filme não encontrado'}")
+            print(
+                f"❌ Erro: {res.get('mensagem') if res else 'Filme não encontrado'}")
+
+    def alugar_filme(self):
+        id_filme = input("Digite o ID do filme para alugar: ")
+        res = self.enviar_requisicao("ALUGAR_FILME", id=int(id_filme))
+
+        if res and res.get("status") == "OK":
+            print(
+                f"✅ Filme '{res.get('dados', {}).get('titulo')}' alugado com sucesso!")
+        else:
+            print(
+                f"❌ Erro: {res.get('mensagem') if res else 'Não foi possível alugar o filme'}")
+
+    def devolver_filme(self):
+        id_filme = input("Digite o ID do filme para devolver: ")
+        res = self.enviar_requisicao("DEVOLVER_FILME", id=int(id_filme))
+
+        if res and res.get("status") == "OK":
+            print(
+                f"✅ Filme '{res.get('dados', {}).get('titulo')}' devolvido com sucesso!")
+        else:
+            print(
+                f"❌ Erro: {res.get('mensagem') if res else 'Não foi possível devolver o filme'}")
 
     def rodar(self):
         self.conectar()
@@ -75,6 +100,10 @@ class ClienteFilmes:
                 self.listar_filmes()
             elif opcao == "2":
                 self.detalhar_filme()
+            elif opcao == "3":
+                self.alugar_filme()
+            elif opcao == "4":
+                self.devolver_filme()
             elif opcao == "0":
                 print("Encerrando conexão.")
                 self.socket.close()
@@ -82,6 +111,7 @@ class ClienteFilmes:
             else:
                 print("Opção inválida!")
 
+
 if __name__ == "__main__":
-    cliente = ClienteFilmes(host='127.0.0.1', port=5000)
+    cliente = ClienteFilmes(host='172.17.0.1', port=5000)
     cliente.rodar()
